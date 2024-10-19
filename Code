@@ -1,0 +1,24 @@
+!pip install transformers
+!pip install torch
+import torch
+from transformers import LlamaForConversation, LlamaTokenizer
+model_name = "llama-13b"
+model = LlamaForConversation.from_pretrained(model_name)
+tokenizer = LlamaTokenizer.from_pretrained(model_name)
+def generate_response(input_text):
+    inputs = tokenizer.encode_plus(
+        input_text,
+        add_special_tokens=True,
+        max_length=512,
+        return_attention_mask=True,
+        return_tensors="pt"
+    )
+    input_ids = inputs["input_ids"].flatten()
+    attention_mask = inputs["attention_mask"].flatten()
+
+    outputs = model(input_ids, attention_mask=attention_mask)
+    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return response
+input_text = "Привет, как дела?"
+response = generate_response(input_text)
+print(response)
